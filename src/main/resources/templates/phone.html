@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/3.3.7/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
+    <title>Phone Number Login </title>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="text-center">
+                        <h3><i class="glyphicon glyphicon-lock" style="font-size:2em;"></i></h3>
+                        <h2 class="text-center">Login</h2>
+                        <div class="panel-body">
+
+
+                            <div class="alert alert-danger hide">
+                                Send Sms Code Error
+                            </div>
+
+
+                            <form th:action="@{/phonelogin}" method="post">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">@</span>
+                                        <input id="phonenumber"
+                                               name="phonenumber"
+                                               autofocus="autofocus"
+                                               class="form-control phonenumber"
+                                               placeholder="Phone Number"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <i class="glyphicon glyphicon-lock"></i>
+                                        </span>
+                                        <input id="verificationcode"
+                                               name="verificationcode"
+                                               class="form-control"
+                                               placeholder="Verification Code"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-success btn-block send-button">Send Verify Code</button>
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-success btn-block">Login</button>
+                                </div>
+                                <div class="form-group">
+                                    <a th:href="@{/login}" class="btn btn-success btn-block">Back to Login Page</a>
+                                </div>
+
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" th:src="@{/webjars/jquery/3.2.1/jquery.min.js/}"></script>
+<script type="text/javascript" th:src="@{/webjars/bootstrap/3.3.7/js/bootstrap.min.js}"></script>
+<script>
+    $(document).ready(function(){
+          $(".send-button").click(function(){
+              code=$.ajax({url:"/sendSmsCode?number="+$(".phonenumber").val(),async:false});
+              if (code == "success") {
+                $("#myDiv").html(htmlobj.responseText);
+              } else {
+                $(".alert-danger").show();
+              }
+
+          });
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+</body>
+</html>
