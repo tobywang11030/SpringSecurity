@@ -1,7 +1,6 @@
 package hello.security.filter;
 
 import hello.security.event.PhoneNumberAuthenticationFailureEvent;
-import hello.security.provider.PhoneNumberAuthentication;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -48,8 +47,7 @@ public class PhoneNumberAuthenticationFilter extends AbstractAuthenticationProce
             String code = session.getAttribute(SMS_CODE).toString();
             if (codeByUser.equals(code)) {
                 List<GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList(ROLE_PREFIX + ROLE_USER);
-                UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(phoneNumber, "N/A", authorities);
-                PhoneNumberAuthentication authentication = new PhoneNumberAuthentication(authorities, token);
+                Authentication authentication = new UsernamePasswordAuthenticationToken(phoneNumber, "N/A", authorities);
                 //publish(new AuthenticationSuccessEvent(authentication));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 session.removeAttribute(SMS_CODE);
