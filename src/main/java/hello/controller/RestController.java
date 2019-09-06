@@ -1,8 +1,12 @@
 package hello.controller;
 
+import hello.model.User;
+import hello.repository.UserRepository;
 import hello.services.SmsService;
 import org.dom4j.DocumentException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -21,6 +25,9 @@ import static hello.constant.AuthenticationConstant.SMS_CODE;
 public class RestController {
     
     @Autowired
+    UserRepository userRepository;
+    
+    @Autowired
     SmsService smsService;
     
     @Autowired
@@ -28,7 +35,6 @@ public class RestController {
     
     
     @RequestMapping("/sendSmsCode")
-    @ResponseBody
     public String sendSmsCode(@PathParam("number") String number) throws DocumentException {
         int mobile_code = (int) ((Math.random() * 9 + 1) * 100000);
         Boolean isSendSuccess = smsService.sendCodeBySMS(number, String.valueOf(mobile_code));
@@ -39,4 +45,11 @@ public class RestController {
         }
         return "error";
     }
+    
+    //@Secured(ROLE_ADMIN)
+    @RequestMapping("/search")
+    public User search(@PathParam("email") String email) {
+        return userRepository.findByEmail(email);
+    }
+    
 }

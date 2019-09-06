@@ -18,6 +18,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -32,12 +34,13 @@ import javax.websocket.server.PathParam;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static hello.constant.AuthenticationConstant.ROLE_ADMIN;
 import static hello.constant.AuthenticationConstant.ROLE_CUSTOM;
 import static hello.constant.AuthenticationConstant.ROLE_PREFIX;
 
-@RestController
+@Controller
 public class MainController {
     
     private static final Logger logger = LoggerFactory.getLogger(MainController.class);
@@ -59,34 +62,27 @@ public class MainController {
     
     //@Secured({ROLE_CUSTOM, ROLE_ADMIN})
     @RequestMapping("/home")
-    public ModelAndView hello() {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject("user", getUser());
-        modelAndView.setViewName("home");
-        return modelAndView;
+    public String home(Model model) {
+        model.addAttribute("user", getUser());
+        return "home";
     }
     
     //@Secured({ROLE_CUSTOM, ROLE_ADMIN})
     @RequestMapping("/")
-    public ModelAndView defaultPage() {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject("user", getUser());
-        modelAndView.setViewName("home");
-        return modelAndView;
+    public String defaultPage(Model model) {
+        model.addAttribute("user", getUser());
+        return "home";
     }
     
     @RequestMapping(value = "/register", method = RequestMethod.GET)
-    public ModelAndView registerPage() {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("register");
-        return modelAndView;
+    public String registerPage() {
+
+        return "register";
     }
     
     @RequestMapping(value = "/phone", method = RequestMethod.GET)
-    public ModelAndView phone() {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("phone");
-        return modelAndView;
+    public String phone() {
+        return "phone";
     }
     
     
@@ -112,12 +108,6 @@ public class MainController {
         response.sendRedirect("/");
     }
     
-    //@Secured(ROLE_ADMIN)
-    @ResponseBody
-    @RequestMapping("/search")
-    public User search(@PathParam("email") String email) {
-        return userRepository.findByEmail(email);
-    }
     
     public User getUser() { //为了session从获取用户信息,可以配置如下
         User user = new User();
@@ -127,13 +117,13 @@ public class MainController {
         } else {
             user.setUsername(auth.getPrincipal().toString());
         }
+        List<GrantedAuthority> authorities = new ArrayList<>(auth.getAuthorities());
+        user.setRole(authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(",")));
         return user;
     }
     
     @RequestMapping("/login")
-    public ModelAndView login() {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("login");
+    public String login() {
         HttpSession session = request.getSession();
         Object uid = session.getAttribute("failureUser");
         if (uid != null) {
@@ -144,7 +134,7 @@ public class MainController {
                 request.setAttribute("blocked", true);
             }
         }
-        return modelAndView;
+        return "login";
     }
     
     private Authentication getAuthentication() {
@@ -153,7 +143,7 @@ public class MainController {
     }
     
     @RequestMapping("/updateRole")
-    public void updateRole() throws IOException {
+    public String updateRole() throws IOException {
         // 得到当前的认证信息
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         //  生成当前的所有授权
@@ -164,7 +154,7 @@ public class MainController {
         Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), updatedAuthorities);
         // 重置认证信息
         SecurityContextHolder.getContext().setAuthentication(newAuth);
-        response.sendRedirect("/");
+        return "redirect:/";
     }
     
     
