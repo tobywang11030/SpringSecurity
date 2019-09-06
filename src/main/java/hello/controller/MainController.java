@@ -10,6 +10,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,7 +30,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.websocket.server.PathParam;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+import static hello.constant.AuthenticationConstant.ROLE_ADMIN;
 import static hello.constant.AuthenticationConstant.ROLE_CUSTOM;
 import static hello.constant.AuthenticationConstant.ROLE_PREFIX;
 
@@ -145,6 +150,21 @@ public class MainController {
     private Authentication getAuthentication() {
         SecurityContext ctx = SecurityContextHolder.getContext();
         return ctx.getAuthentication();
+    }
+    
+    @RequestMapping("/updateRole")
+    public void updateRole() throws IOException {
+        // 得到当前的认证信息
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        //  生成当前的所有授权
+        List<GrantedAuthority> updatedAuthorities = new ArrayList<>(auth.getAuthorities());
+        // 添加 ROLE_VIP 授权
+        updatedAuthorities.add(new SimpleGrantedAuthority(ROLE_PREFIX+ROLE_ADMIN));
+        // 生成新的认证信息
+        Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), updatedAuthorities);
+        // 重置认证信息
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
+        response.sendRedirect("/");
     }
     
     
