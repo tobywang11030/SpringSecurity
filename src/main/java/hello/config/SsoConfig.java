@@ -45,6 +45,18 @@ public class SsoConfig {
     }
     
     @Bean
+    @ConfigurationProperties("cas.client")
+    public AuthorizationCodeResourceDetails cas() {
+        return new AuthorizationCodeResourceDetails();
+    }
+    
+    @Bean
+    @ConfigurationProperties("cas.resource")
+    public ResourceServerProperties casResource() {
+        return new ResourceServerProperties();
+    }
+    
+    @Bean
     public FilterRegistrationBean oauth2ClientFilterRegistration() {
         FilterRegistrationBean registration = new FilterRegistrationBean();
         registration.setFilter(new OAuth2ClientContextFilter());
@@ -55,12 +67,23 @@ public class SsoConfig {
     @Bean
     public Filter githubSsoFilter() {
         OAuth2ClientAuthenticationProcessingFilter githubFilter = new OAuth2ClientAuthenticationProcessingFilter("/login/github");
-        OAuth2RestTemplate facebookTemplate = new OAuth2RestTemplate(github(), oauth2ClientContext);
-        githubFilter.setRestTemplate(facebookTemplate);
+        OAuth2RestTemplate githubTemplate = new OAuth2RestTemplate(github(), oauth2ClientContext);
+        githubFilter.setRestTemplate(githubTemplate);
         UserInfoTokenServices tokenServices = new UserInfoTokenServices(githubResource().getUserInfoUri(), github().getClientId());
-        tokenServices.setRestTemplate(facebookTemplate);
+        tokenServices.setRestTemplate(githubTemplate);
         githubFilter.setTokenServices(tokenServices);
         return githubFilter;
+    }
+    
+    @Bean
+    public Filter casSsoFilter() {
+        OAuth2ClientAuthenticationProcessingFilter casFilter = new OAuth2ClientAuthenticationProcessingFilter("/login/cas");
+        OAuth2RestTemplate casTemplate = new OAuth2RestTemplate(cas(), oauth2ClientContext);
+        casFilter.setRestTemplate(casTemplate);
+        UserInfoTokenServices tokenServices = new UserInfoTokenServices(casResource().getUserInfoUri(), cas().getClientId());
+        tokenServices.setRestTemplate(casTemplate);
+        casFilter.setTokenServices(tokenServices);
+        return casFilter;
     }
     
     @Bean
