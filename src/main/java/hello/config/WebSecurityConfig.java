@@ -71,7 +71,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 deleteCookies("JSESSIONID").logoutSuccessHandler(logoutSuccessHandler()).and().rememberMe().key(
                 "unique-and-secret").rememberMeCookieName("remember-me-cookie-name").tokenValiditySeconds(24 * 60 * 60).
                 and().sessionManagement().maximumSessions(10).expiredUrl("/login");
-        http.requiresChannel().antMatchers("/**").requiresSecure();
+        //http.requiresChannel().antMatchers("/**").requiresSecure();
         
         http.addFilterBefore(githubSsoFilter, BasicAuthenticationFilter.class);
         http.addFilterBefore(casSsoFilter, BasicAuthenticationFilter.class);

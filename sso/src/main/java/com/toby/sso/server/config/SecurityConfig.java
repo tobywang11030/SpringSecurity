@@ -55,16 +55,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .clearAuthentication(true)
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                 .deleteCookies("JSESSIONID")
-                .logoutSuccessHandler(logoutSuccessHandler())
-                .and()
-                .rememberMe()
-                .key("unique-and-secret")
-                .rememberMeCookieName("remember-me-cookie-name")
-                .tokenValiditySeconds(24 * 60 * 60)
-                .and()
-                .sessionManagement()
-                .maximumSessions(10)
-                .expiredUrl("/login");
+                .logoutSuccessHandler(logoutSuccessHandler());
     }
 
     
