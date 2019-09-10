@@ -25,7 +25,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     private DataSource dataSource;
     
     @Bean // 声明TokenStore实现
-    public TokenStore tokenStore() {
+    public TokenStore jDbcTokenStore() {
         return new JdbcTokenStore(dataSource);
     }
     
@@ -59,7 +59,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
      */
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-        endpoints.tokenStore(tokenStore());
+        endpoints.tokenStore(jDbcTokenStore());
     }
     
    

@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -15,14 +16,23 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationManager;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationProcessingFilter;
+import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
+import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
+import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import javax.annotation.Resource;
+import javax.servlet.Filter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 import java.io.IOException;
 
 /**
@@ -37,6 +47,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     
     @Autowired
     private MyUserDetailsService myUserDetailsService;
+    
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    
+    @Autowired
+    private TokenStore jDbcTokenStore;
+    
+    
+    
     
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -56,6 +75,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                 .deleteCookies("JSESSIONID")
                 .logoutSuccessHandler(logoutSuccessHandler());
+        http.addFilterBefore(resourceFilter(), BasicAuthenticationFilter.class);
     }
 
     
@@ -112,5 +132,25 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 super.onAuthenticationSuccess(request, response, authentication);
             }
         };
+    }
+    
+    private Filter resourceFilter(){
+        OAuth2AuthenticationProcessingFilter resourceFilter = new OAuth2AuthenticationProcessingFilter();
+        OAuth2AuthenticationManager oauthAuthenticationManager = new OAuth2AuthenticationManager();
+        if (authenticationManager != null) {
+            if (authenticationManager instanceof OAuth2AuthenticationManager) {
+                oauthAuthenticationManager = (OAuth2AuthenticationManager) authenticationManager;
+            }
+            
+        }
+        oauthAuthenticationManager.setTokenServices(tokenService());
+        resourceFilter.setAuthenticationManager(oauthAuthenticationManager);
+        return resourceFilter;
+    }
+    
+    private ResourceServerTokenServices tokenService() {
+        DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
+        defaultTokenServices.setTokenStore(jDbcTokenStore);
+        return defaultTokenServices;
     }
 }
