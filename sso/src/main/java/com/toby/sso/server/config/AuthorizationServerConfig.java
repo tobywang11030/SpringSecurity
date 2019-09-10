@@ -1,11 +1,14 @@
 package com.toby.sso.server.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
@@ -20,6 +23,11 @@ import javax.sql.DataSource;
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
     @Resource
     private DataSource dataSource;
+    
+    @Bean // 声明TokenStore实现
+    public TokenStore tokenStore() {
+        return new JdbcTokenStore(dataSource);
+    }
     
     /**
      * 配置授权服务器的安全，意味着实际上是/oauth/token端点。
@@ -51,7 +59,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
      */
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-        super.configure(endpoints);
+        endpoints.tokenStore(tokenStore());
     }
     
    
