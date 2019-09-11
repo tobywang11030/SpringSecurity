@@ -44,12 +44,6 @@ public class MainController {
         return "index";
     }
     
-    @RequestMapping("/custom/confirm_access")
-    public String confirmAccess(Model model) {
-        model.addAttribute("clientId", request.getParameter("client_id"));
-        return "base-grant";
-    }
-    
     private Authentication getAuthentication() {
         SecurityContext ctx = SecurityContextHolder.getContext();
         return ctx.getAuthentication();
