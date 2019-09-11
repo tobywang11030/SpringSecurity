@@ -1,6 +1,7 @@
 package com.toby.sso.server.config;
 
 import com.toby.sso.server.model.SecurityUser;
+import com.toby.sso.server.services.MyJdbcTokenStore;
 import com.toby.sso.server.services.MyUserDetailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,11 +57,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private AuthenticationManager authenticationManager;
     
-    @Autowired
-    private TokenStore jDbcTokenStore;
-    
     @Resource
     private DataSource dataSource;
+    
+    @Autowired
+    private TokenStore jDbcTokenStore;
     
     
     
@@ -164,4 +165,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         defaultTokenServices.setClientDetailsService(clientDetailsService);
         return defaultTokenServices;
     }
+    
 }

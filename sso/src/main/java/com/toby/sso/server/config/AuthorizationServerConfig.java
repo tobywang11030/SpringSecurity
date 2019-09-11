@@ -1,5 +1,9 @@
 package com.toby.sso.server.config;
 
+import com.toby.sso.server.repository.AccessTokenRepository;
+import com.toby.sso.server.repository.UserRepository;
+import com.toby.sso.server.services.MyJdbcTokenStore;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
@@ -24,9 +28,15 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Resource
     private DataSource dataSource;
     
+    @Autowired
+    private AccessTokenRepository accessTokenRepository;
+    
+    @Autowired
+    UserRepository userRepository;
+    
     @Bean // 声明TokenStore实现
     public TokenStore jDbcTokenStore() {
-        return new JdbcTokenStore(dataSource);
+        return new MyJdbcTokenStore(dataSource,accessTokenRepository,userRepository);
     }
     
     /**
