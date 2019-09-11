@@ -1,6 +1,7 @@
 package com.toby.sso.server.controller;
 
 import com.toby.sso.server.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -11,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,7 +22,10 @@ import java.util.stream.Collectors;
  * @date 9/9/2019
  */
 @Controller
-public class LoginController {
+public class MainController {
+    
+    @Autowired
+    private HttpServletRequest request;
     
     @GetMapping("/login")
     public String login() {
@@ -37,6 +42,12 @@ public class LoginController {
     public String defaultPage(Model model) {
         model.addAttribute("user", getUser());
         return "index";
+    }
+    
+    @RequestMapping("/custom/confirm_access")
+    public String confirmAccess(Model model) {
+        model.addAttribute("clientId", request.getParameter("client_id"));
+        return "base-grant";
     }
     
     private Authentication getAuthentication() {
