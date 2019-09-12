@@ -44,10 +44,17 @@ public class MyJdbcTokenStore extends JdbcTokenStore {
         if (authenticationFromToken != null) {
             OauthAccessToken oauthAccessToken = accessTokenRepository.findByTokenId(extractTokenKey(token));
             if (oauthAccessToken != null) {
-                User user = userRepository.findByUsername(oauthAccessToken.getUserName());
-                Authentication userAuthentication = new UsernamePasswordAuthenticationToken(new SecurityUser(user),null,
-                        AuthorityUtils.commaSeparatedStringToAuthorityList(user.getRole()));
-                authentication = new OAuth2Authentication(authenticationFromToken.getOAuth2Request(),userAuthentication);
+                if (authenticationFromToken.getOAuth2Request().getScope().contains("user_info")){
+                    User user = userRepository.findByUsername(oauthAccessToken.getUserName());
+                    user.setPassword(null);
+                    Authentication userAuthentication = new UsernamePasswordAuthenticationToken(new SecurityUser(user),null,
+                            AuthorityUtils.commaSeparatedStringToAuthorityList(user.getRole()));
+                    authentication = new OAuth2Authentication(authenticationFromToken.getOAuth2Request(),userAuthentication);
+                } else if (authenticationFromToken.getOAuth2Request().getScope().contains("base_info")){
+                    Authentication userAuthentication = new UsernamePasswordAuthenticationToken(oauthAccessToken.getUserName(),null,
+                            authenticationFromToken.getAuthorities());
+                    authentication = new OAuth2Authentication(authenticationFromToken.getOAuth2Request(),userAuthentication);
+                }
             }
         }
         

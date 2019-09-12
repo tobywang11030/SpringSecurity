@@ -37,7 +37,12 @@
             <form id='confirmationForm' name='confirmationForm' action="/oauth/authorize" method='post'>
                 <input name='user_oauth_approval' value='true' type='hidden'/>
                 <!--写好授权访问领域-->
-                <input th:name="${s}" value="true" type="hidden" th:each="s : ${scopeList}"/>
+                <div  th:each="s : ${scopeList}">
+                    <label th:text="${s}"></label>
+                    <input th:name="${s}" value="true" type="checkbox"/>
+
+                </div>
+
                 <input class="ui-btn-primary ui-btn-lg ui-btn-primary" name='authorize' value='授权' type='submit'/>
             </form>
         </div>

@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
@@ -34,11 +35,14 @@ import javax.websocket.server.PathParam;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import static hello.constant.AuthenticationConstant.PRINCIPAL;
 import static hello.constant.AuthenticationConstant.ROLE_ADMIN;
 import static hello.constant.AuthenticationConstant.ROLE_CUSTOM;
 import static hello.constant.AuthenticationConstant.ROLE_PREFIX;
+import static hello.utils.BeanUtils.toBean;
 
 @Controller
 public class MainController {
@@ -110,13 +114,28 @@ public class MainController {
     
     
     public User getUser() { //为了session从获取用户信息,可以配置如下
-        User user = new User();
+       
+        User user;
         Authentication auth = getAuthentication();
-        if (auth.getPrincipal() instanceof UserDetails) {
-            user = (User) auth.getPrincipal();
+        if (auth instanceof OAuth2Authentication) {
+            Map<String,Object> detailMap = (Map<String, Object>) ((OAuth2Authentication) auth).getUserAuthentication().getDetails();
+            if (detailMap.get(PRINCIPAL) instanceof Map) {
+                Map<String,Object> principal = (Map<String, Object>) detailMap.get(PRINCIPAL);
+                user = toBean(principal,User.class);
+            } else {
+                user = new User();
+                user.setUsername(detailMap.get(PRINCIPAL).toString());
+            }
+            
         } else {
-            user.setUsername(auth.getPrincipal().toString());
+            user = new User();
+            if (auth.getPrincipal() instanceof UserDetails) {
+                user = (User) auth.getPrincipal();
+            } else {
+                user.setUsername(auth.getPrincipal().toString());
+            }
         }
+        
         List<GrantedAuthority> authorities = new ArrayList<>(auth.getAuthorities());
         user.setRole(authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(",")));
         return user;

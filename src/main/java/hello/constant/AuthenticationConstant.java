@@ -10,4 +10,5 @@ public class AuthenticationConstant {
     public static final String ROLE_USER = "USER";
     public static final String ROLE_PREFIX = "ROLE_";
     public static final String SMS_CODE = "smsCode";
+    public static final String PRINCIPAL = "principal";
 }
