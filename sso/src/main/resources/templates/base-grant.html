@@ -39,7 +39,7 @@
                 <!--写好授权访问领域-->
                 <div >
                     <label>基本信息：用户ID</label>
-                    <input name="scope.base_info" value="true" type="checkbox" οnclick="return false;" checked="checked"/>
+                    <input name="scope.base_info" value="true" type="checkbox" class="base-info" checked="checked"/>
                 </div>
                 <div >
                     <label>全部信息：用户ID，Email，Telephone...</label>
@@ -51,5 +51,19 @@
         </div>
     </section>
 </div>
+<script type="text/javascript" th:src="@{/webjars/jquery/3.2.1/jquery.min.js/}"></script>
+<script language="javascript">
+
+$(function(){
+
+    $('.base-info').click(function(){
+
+        this.checked = !this.checked;
+
+    });
+
+});
+
+</script>
 </body>
 </html>
