@@ -28,10 +28,12 @@ public class SsoConfig {
     @Autowired
     OAuth2ClientContext oauth2ClientContext;
     
+    //自定义filter可用此对象发布认证成功事件
     @Autowired
     private ApplicationContext applicationContext;
     
     
+    //从配置文件读取并自动填充到Bean
     @Bean
     @ConfigurationProperties("github.client")
     public AuthorizationCodeResourceDetails github() {
@@ -56,10 +58,12 @@ public class SsoConfig {
         return new ResourceServerProperties();
     }
     
+    //Oauth2的全局filter，需注册到合适位置，作用为捕获为认证异常转发到认证中心
     @Bean
     public FilterRegistrationBean oauth2ClientFilterRegistration() {
         FilterRegistrationBean registration = new FilterRegistrationBean();
         registration.setFilter(new OAuth2ClientContextFilter());
+        //配置filter的order
         registration.setOrder(-100);
         return registration;
     }

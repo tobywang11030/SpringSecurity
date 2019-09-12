@@ -98,7 +98,7 @@ public class MainController {
         user.setPassword(enPassword);
         user.setRole(ROLE_PREFIX + ROLE_CUSTOM);
         userRepository.save(user);
-        //进行授权登录
+        //注册成功后，自动登录，封装auth对象添加到SecurityContextHolder.getContext()
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user.getUsername(), originalPassword);
         try {
             token.setDetails(new WebAuthenticationDetails(request));
@@ -117,6 +117,7 @@ public class MainController {
        
         User user;
         Authentication auth = getAuthentication();
+        //由于从SSO拿到的auth对象的principal不是UserDetail实例，所以需要自己封装
         if (auth instanceof OAuth2Authentication) {
             Map<String,Object> detailMap = (Map<String, Object>) ((OAuth2Authentication) auth).getUserAuthentication().getDetails();
             if (detailMap.get(PRINCIPAL) instanceof Map) {
@@ -124,7 +125,12 @@ public class MainController {
                 user = toBean(principal,User.class);
             } else {
                 user = new User();
-                user.setUsername(detailMap.get(PRINCIPAL).toString());
+                if (detailMap.containsKey(PRINCIPAL)) {
+                    user.setUsername(detailMap.get(PRINCIPAL).toString());
+                }else if (detailMap.containsKey("login")) {
+                    user.setUsername(detailMap.get("login").toString());
+                }
+                
             }
             
         } else {
@@ -161,6 +167,7 @@ public class MainController {
         return ctx.getAuthentication();
     }
     
+    //动态修改当前用户Role，但不能持久化
     @RequestMapping("/updateRole")
     public String updateRole() throws IOException {
         // 得到当前的认证信息

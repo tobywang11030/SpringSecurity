@@ -55,16 +55,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private MyUserDetailsService myUserDetailsService;
     
     @Autowired
-    private AuthenticationManager authenticationManager;
-    
-    @Resource
-    private DataSource dataSource;
+    private ResourceServerTokenServices customTokenService;
     
     @Autowired
-    private TokenStore jDbcTokenStore;
-    
-    
-    
+    private AuthenticationManager authenticationManager;
+
     
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -143,27 +138,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         };
     }
     
-    private Filter resourceFilter(){
+    
+    public Filter resourceFilter(){
         OAuth2AuthenticationProcessingFilter resourceFilter = new OAuth2AuthenticationProcessingFilter();
         OAuth2AuthenticationManager oauthAuthenticationManager = new OAuth2AuthenticationManager();
         if (authenticationManager != null) {
             if (authenticationManager instanceof OAuth2AuthenticationManager) {
                 oauthAuthenticationManager = (OAuth2AuthenticationManager) authenticationManager;
             }
-            
         }
-        oauthAuthenticationManager.setTokenServices(tokenService());
+        oauthAuthenticationManager.setTokenServices(customTokenService);
         resourceFilter.setAuthenticationManager(oauthAuthenticationManager);
         resourceFilter.setStateless(false);
         return resourceFilter;
     }
     
-    private ResourceServerTokenServices tokenService() {
-        DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
-        ClientDetailsService clientDetailsService = new JdbcClientDetailsService(dataSource);
-        defaultTokenServices.setTokenStore(jDbcTokenStore);
-        defaultTokenServices.setClientDetailsService(clientDetailsService);
-        return defaultTokenServices;
-    }
     
 }

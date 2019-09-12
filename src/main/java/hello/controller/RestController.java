@@ -39,6 +39,7 @@ public class RestController {
         int mobile_code = (int) ((Math.random() * 9 + 1) * 100000);
         Boolean isSendSuccess = smsService.sendCodeBySMS(number, String.valueOf(mobile_code));
         if (isSendSuccess) {
+            //将验证码存储在Session当中供filter验证
             HttpSession session = request.getSession();
             session.setAttribute(SMS_CODE, mobile_code);
             return "success";

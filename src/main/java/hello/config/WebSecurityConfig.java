@@ -33,12 +33,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static hello.constant.AuthenticationConstant.ROLE_ADMIN;
-import static hello.constant.AuthenticationConstant.ROLE_CUSTOM;
-import static hello.constant.AuthenticationConstant.ROLE_USER;
 
 @Configuration
-@EnableWebSecurity
-//@EnableOAuth2Sso
+@EnableWebSecurity  //启用此注解，需自己注册oauth2的相关Filter
+//@EnableOAuth2Sso 若启用此注解，全局所有认证都将跳转到SSO认证中心去认证，而应用本身的其他登录方式比如表单登录将失效
 @EnableOAuth2Client
 @EnableGlobalMethodSecurity(securedEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -73,8 +71,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 and().sessionManagement().maximumSessions(10).expiredUrl("/login");
         //http.requiresChannel().antMatchers("/**").requiresSecure();
         
+        //Github 的 SSO filter
         http.addFilterBefore(githubSsoFilter, BasicAuthenticationFilter.class);
+        //自定义认证中心的SSO filter
         http.addFilterBefore(casSsoFilter, BasicAuthenticationFilter.class);
+        //自定义filter实现手机号+短信验证码登录
         http.addFilterBefore(phoneNumberAuthFilter, BasicAuthenticationFilter.class);
     }
     
@@ -106,7 +107,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             
             @Override
             public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-                if (isBlocked(s)) {
+                if (isBlocked(s)) { //登录失败次数验证
                     throw new RuntimeException("blocked");
                 }
                 User user = userRepository.findByUsername(s);
@@ -123,6 +124,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return loginAttemptService.getUserLoginCount(uid) > 2;
     }
     
+    //存储用户密码的时候也必须使用此Encoder
     @Bean
     public BCryptPasswordEncoder passwordEncoder() { //密码加密
         return new BCryptPasswordEncoder(4);
