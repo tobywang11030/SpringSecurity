@@ -46,7 +46,7 @@ public class MyJdbcTokenStore extends JdbcTokenStore {
             if (oauthAccessToken != null) {
                 if (authenticationFromToken.getOAuth2Request().getScope().contains("user_info")){
                     User user = userRepository.findByUsername(oauthAccessToken.getUserName());
-                    user.setPassword(null);
+                    //user.setPassword(null);
                     Authentication userAuthentication = new UsernamePasswordAuthenticationToken(new SecurityUser(user),null,
                             AuthorityUtils.commaSeparatedStringToAuthorityList(user.getRole()));
                     authentication = new OAuth2Authentication(authenticationFromToken.getOAuth2Request(),userAuthentication);

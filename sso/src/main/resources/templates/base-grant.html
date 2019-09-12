@@ -37,10 +37,13 @@
             <form id='confirmationForm' name='confirmationForm' action="/oauth/authorize" method='post'>
                 <input name='user_oauth_approval' value='true' type='hidden'/>
                 <!--写好授权访问领域-->
-                <div  th:each="s : ${scopeList}">
-                    <label th:text="${s}"></label>
-                    <input th:name="${s}" value="true" type="checkbox"/>
-
+                <div >
+                    <label>基本信息：用户ID</label>
+                    <input name="scope.base_info" value="true" type="checkbox" οnclick="return false;" checked="checked"/>
+                </div>
+                <div >
+                    <label>全部信息：用户ID，Email，Telephone...</label>
+                    <input name="scope.user_info" value="true" type="checkbox"/>
                 </div>
 
                 <input class="ui-btn-primary ui-btn-lg ui-btn-primary" name='authorize' value='授权' type='submit'/>
