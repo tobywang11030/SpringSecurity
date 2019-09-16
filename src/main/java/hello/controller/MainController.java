@@ -1,5 +1,6 @@
 package hello.controller;
 
+import hello.aspect.RequestLimit;
 import hello.model.User;
 import hello.repository.UserRepository;
 import hello.services.LoginAttemptService;
@@ -147,8 +148,9 @@ public class MainController {
         return user;
     }
     
+    @RequestLimit(count = 2)
     @RequestMapping("/login")
-    public String login() {
+    public String login(HttpServletRequest request) {
         HttpSession session = request.getSession();
         Object uid = session.getAttribute("failureUser");
         if (uid != null) {

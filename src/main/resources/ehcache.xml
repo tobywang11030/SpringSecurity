@@ -13,11 +13,23 @@
             memoryStoreEvictionPolicy="LRU">
         <persistence strategy="localTempSwap"/>
     </defaultCache>
+    <!--24小时后缓存失效，登录失败超过三次的用户可继续登录 -->
     <cache name="users"
            maxElementsInMemory="10000"
            eternal="false"
-           timeToIdleSeconds="120"
-           timeToLiveSeconds="120"
+           timeToIdleSeconds="0"
+           timeToLiveSeconds="86400"
+           maxElementsOnDisk="10000000"
+           diskExpiryThreadIntervalSeconds="120"
+           memoryStoreEvictionPolicy="LRU">
+        <persistence strategy="localTempSwap"/>
+    </cache>
+    <!--若5秒内不操作，则缓存失效，超过访问限制的IP可继续访问-->
+    <cache name="limits"
+           maxElementsInMemory="10000"
+           eternal="false"
+           timeToIdleSeconds="5"
+           timeToLiveSeconds="0"
            maxElementsOnDisk="10000000"
            diskExpiryThreadIntervalSeconds="120"
            memoryStoreEvictionPolicy="LRU">
