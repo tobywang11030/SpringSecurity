@@ -1,6 +1,7 @@
 package hello.aspect.impl;
 
 import hello.aspect.RequestLimit;
+import hello.exception.RequestLimitException;
 import hello.services.RequestLimitService;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -51,7 +52,7 @@ public class RequestLimitAspect {
         
         if (count > limit.count()) {
             logger.info("用户IP[{}]访问地址[{}]超过了限定的访问次数[{}]",ip,request.getRequestURL().toString(),limit.count());
-            throw new RuntimeException("请求频率太快，请过5秒后再访问");
+            throw new RequestLimitException(444,"请求频率太快，请过5秒后再访问");
         }
     }
 }
