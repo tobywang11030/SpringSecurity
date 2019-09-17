@@ -2,6 +2,7 @@ package hello.config;
 
 import hello.security.filter.PhoneNumberAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoTokenServices;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -95,5 +96,29 @@ public class SsoConfig {
         PhoneNumberAuthenticationFilter phoneNumberilter = new PhoneNumberAuthenticationFilter("/phonelogin");
         phoneNumberilter.setApplicationEventPublisher(applicationContext);
         return phoneNumberilter;
+    }
+    
+    //在springboot中，@Bean注解会自动注册Filter，Servlet，listener，
+    // 下面的三个filter是需要有spring security添加到springsecuritychain中的，不需要系统注册为全局filter，所以关闭全局注册
+    
+    @Bean
+    public FilterRegistrationBean registration(@Qualifier("githubSsoFilter") Filter filter) {
+        FilterRegistrationBean registration = new FilterRegistrationBean(filter);
+        registration.setEnabled(false);
+        return registration;
+    }
+    
+    @Bean
+    public FilterRegistrationBean registrationCasSsoFilter(@Qualifier("casSsoFilter") Filter filter) {
+        FilterRegistrationBean registration = new FilterRegistrationBean(filter);
+        registration.setEnabled(false);
+        return registration;
+    }
+    
+    @Bean
+    public FilterRegistrationBean registrationPhoneNumberAuthFilter(@Qualifier("phoneNumberAuthFilter") Filter filter) {
+        FilterRegistrationBean registration = new FilterRegistrationBean(filter);
+        registration.setEnabled(false);
+        return registration;
     }
 }
