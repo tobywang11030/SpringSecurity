@@ -139,6 +139,7 @@ public class MainController {
             if (auth.getPrincipal() instanceof UserDetails) {
                 user = (User) auth.getPrincipal();
             } else {
+                //目前phoneNumber登录的获得的User不是User对象
                 user.setUsername(auth.getPrincipal().toString());
             }
         }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 /**
  * @author tobywang
  * @date 8/29/2019
+ *  使用JPA查询数据库，可不写具体sql，采用 [fandBy字段] 的方式
  */
 
 @Repository

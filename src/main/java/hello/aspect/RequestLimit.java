@@ -12,6 +12,7 @@ import java.lang.annotation.Target;
 /**
  * @author tobywang
  * @date 9/16/2019
+ * 自定义注解
  */
 
 @Retention(RetentionPolicy.RUNTIME)

@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author tobywang
  * @date 9/16/2019
+ * 捕获自定义异常，返回自定义view
  */
 
 @ControllerAdvice

@@ -48,7 +48,9 @@ public class PhoneNumberAuthenticationFilter extends AbstractAuthenticationProce
             if (codeByUser.equals(code)) {
                 List<GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList(ROLE_PREFIX + ROLE_USER);
                 Authentication authentication = new UsernamePasswordAuthenticationToken(phoneNumber, "N/A", authorities);
+                //使用publish发布成功结果Authentication
                 //publish(new AuthenticationSuccessEvent(authentication));
+                //通过将Authentication添加到SecurityContext中
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 session.removeAttribute(SMS_CODE);
                 return authentication;

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 /**
  * @author tobywang
  * @date 8/30/2019
+ * 登录成功的监听器，这里的作用为清空失败计数
  */
 @Component
 public class AuthenticationSuccessEventListener implements ApplicationListener<AuthenticationSuccessEvent> {

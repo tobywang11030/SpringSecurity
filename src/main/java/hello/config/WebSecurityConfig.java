@@ -38,9 +38,10 @@ import java.io.IOException;
 import static hello.constant.AuthenticationConstant.ROLE_ADMIN;
 
 @Configuration
-@EnableWebSecurity  //启用此注解，需自己注册oauth2的相关Filter
-//@EnableOAuth2Sso 若启用此注解，全局所有认证都将跳转到SSO认证中心去认证，而应用本身的其他登录方式比如表单登录将失效
-@EnableOAuth2Client
+@EnableWebSecurity
+//@EnableOAuth2Sso 若启用此注解，全局所有认证都将跳转到SSO认证中心去认证，而应用本身的其他登录方式比如表单登录将失效,具体可以看这个注解的源码
+                    //中的WebSecurityConfigurerAdapter覆盖了自己的配置
+@EnableOAuth2Client//启用此注解，需自己注册oauth2的相关Filter
 @EnableGlobalMethodSecurity(securedEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     
@@ -76,6 +77,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "unique-and-secret").rememberMeCookieName("remember-me-cookie-name").tokenValiditySeconds(24 * 60 * 60).
                 and().sessionManagement().maximumSessions(10).expiredUrl("/login");
         //http.requiresChannel().antMatchers("/**").requiresSecure();
+        
+        //@Bean注解可以自动注册Filter，但它不是添加到SpringSecurity的过滤器链当中，造成无法正确处理认证结果，所以需要使用
+        //下面的方式注册
     
         //Oauth2的全局filter，需注册到合适位置，作用为捕获为认证异常转发到认证中心
         http.addFilterBefore(oauth2ClientContextFilter, SecurityContextPersistenceFilter.class);
@@ -106,10 +110,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         auth.eraseCredentials(false);
     }
     
+    
+    //也可通过创建一个类实现UserDetailsService接口加上@service注解，这里采用的是JavaConfig 的方法返回Bean的形式
     @Override
     @Bean
     public UserDetailsService userDetailsService() {    //用户登录实现
         return new UserDetailsService() {
+            
+            //自己实现的用户D奥层，从数据库获得User
             @Autowired
             private UserRepository userRepository;
             

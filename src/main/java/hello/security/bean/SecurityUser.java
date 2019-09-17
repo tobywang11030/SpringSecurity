@@ -14,6 +14,8 @@ import static hello.constant.AuthenticationConstant.ROLE_CUSTOM;
 /**
  * @author tobywang
  * @date 8/29/2019
+ * 实现自定义User对象的role字段和getAuthorities的转换
+ * 需要实现UserDetails接口才能放到SecurityContext中
  */
 public class SecurityUser extends User implements UserDetails {
     private static final long serialVersionUID = 1L;

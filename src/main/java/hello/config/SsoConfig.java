@@ -59,15 +59,6 @@ public class SsoConfig {
         return new ResourceServerProperties();
     }
     
-    //Oauth2的全局filter，需注册到合适位置，作用为捕获为认证异常转发到认证中心
-    /*@Bean
-    public FilterRegistrationBean oauth2ClientFilterRegistration() {
-        FilterRegistrationBean registration = new FilterRegistrationBean();
-        registration.setFilter(new OAuth2ClientContextFilter());
-        //配置filter的order
-        registration.setOrder(-100);
-        return registration;
-    }*/
     
     @Bean
     public Filter githubSsoFilter() {

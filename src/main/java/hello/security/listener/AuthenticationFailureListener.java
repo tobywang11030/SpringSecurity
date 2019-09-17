@@ -12,6 +12,7 @@ import javax.servlet.http.HttpSession;
 /**
  * @author tobywang
  * @date 8/30/2019
+ * 登录失败的监听器，这里的作用为失败计数
  */
 @Component
 public class AuthenticationFailureListener implements ApplicationListener<AuthenticationFailureBadCredentialsEvent> {

@@ -19,6 +19,8 @@ import static hello.utils.IpAdrressUtil.getIpAddr;
 /**
  * @author tobywang
  * @date 9/16/2019
+ *
+ * 自定义切面，实现如果有方法添加了RequestLimit注解，则触发此切面
  */
 
 @Aspect

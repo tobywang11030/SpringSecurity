@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class RequestLimitService {
     
+    //直接使用ehcache注解，可不用cacheManager
     @Autowired
     CacheManager cacheManager;
     
