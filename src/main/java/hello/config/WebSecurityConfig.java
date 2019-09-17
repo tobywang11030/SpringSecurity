@@ -21,10 +21,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.client.filter.OAuth2ClientContextFilter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import javax.servlet.Filter;
@@ -56,6 +58,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private Filter casSsoFilter;
     
+    @Autowired
+    private OAuth2ClientContextFilter oauth2ClientContextFilter;
+    
     
     @Override
     protected void configure(HttpSecurity http) throws Exception { //配置策略
@@ -71,7 +76,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "unique-and-secret").rememberMeCookieName("remember-me-cookie-name").tokenValiditySeconds(24 * 60 * 60).
                 and().sessionManagement().maximumSessions(10).expiredUrl("/login");
         //http.requiresChannel().antMatchers("/**").requiresSecure();
-        
+    
+        //Oauth2的全局filter，需注册到合适位置，作用为捕获为认证异常转发到认证中心
+        http.addFilterBefore(oauth2ClientContextFilter, SecurityContextPersistenceFilter.class);
         //Github 的 SSO filter
         http.addFilterBefore(githubSsoFilter, BasicAuthenticationFilter.class);
         //自定义认证中心的SSO filter
