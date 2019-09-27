@@ -11,7 +11,7 @@ import java.io.Serializable;
 public class FileIndex implements Serializable {
     
     private static final long serialVersionUID = 8352940146876879705L;
-    @Field("id")
+    //@Field("id") 因为ID是自增的，所以这里会报错，还未解决
     private String id;
     
     @Field("name")
