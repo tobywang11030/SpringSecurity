@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -40,7 +39,7 @@ import static hello.constant.AuthenticationConstant.ROLE_ADMIN;
 @Configuration
 @EnableWebSecurity
 //@EnableOAuth2Sso 若启用此注解，全局所有认证都将跳转到SSO认证中心去认证，而应用本身的其他登录方式比如表单登录将失效,具体可以看这个注解的源码
-                    //中的WebSecurityConfigurerAdapter覆盖了自己的配置
+//中的WebSecurityConfigurerAdapter覆盖了自己的配置
 @EnableOAuth2Client//启用此注解，需自己注册oauth2的相关Filter
 @EnableGlobalMethodSecurity(securedEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -68,9 +67,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http.authorizeRequests().
                 antMatchers("/search").hasRole(ROLE_ADMIN).
-                antMatchers("/phone","/register","/sendSmsCode").permitAll().anyRequest().authenticated().
+                antMatchers("/phone", "/register", "/sendSmsCode", "/indexFile/**", "/searchFile").permitAll().anyRequest().authenticated().
                 //antMatchers("/home", "/").hasAnyRole(ROLE_ADMIN, ROLE_CUSTOM, ROLE_USER).
-                and().formLogin().loginPage("/login").permitAll().successHandler(loginSuccessHandler()).
+                        and().formLogin().loginPage("/login").permitAll().successHandler(loginSuccessHandler()).
                 and().logout().permitAll().invalidateHttpSession(true).clearAuthentication(true).
                 logoutRequestMatcher(new AntPathRequestMatcher("/logout")).
                 deleteCookies("JSESSIONID").logoutSuccessHandler(logoutSuccessHandler()).and().rememberMe().key(
@@ -80,7 +79,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         
         //@Bean注解可以自动注册Filter，但它不是添加到SpringSecurity的过滤器链当中，造成无法正确处理认证结果，所以需要使用
         //下面的方式注册
-    
+        
         //Oauth2的全局filter，需注册到合适位置，作用为捕获为认证异常转发到认证中心
         http.addFilterBefore(oauth2ClientContextFilter, SecurityContextPersistenceFilter.class);
         //Github 的 SSO filter

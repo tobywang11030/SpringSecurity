@@ -25,14 +25,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.websocket.server.PathParam;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -81,7 +77,7 @@ public class MainController {
     
     @RequestMapping(value = "/register", method = RequestMethod.GET)
     public String registerPage() {
-
+        
         return "register";
     }
     
@@ -115,20 +111,20 @@ public class MainController {
     
     
     public User getUser() { //为了session从获取用户信息,可以配置如下
-       
+        
         User user;
         Authentication auth = getAuthentication();
         //由于从SSO拿到的auth对象的principal不是UserDetail实例，所以需要自己封装
         if (auth instanceof OAuth2Authentication) {
-            Map<String,Object> detailMap = (Map<String, Object>) ((OAuth2Authentication) auth).getUserAuthentication().getDetails();
+            Map<String, Object> detailMap = (Map<String, Object>) ((OAuth2Authentication) auth).getUserAuthentication().getDetails();
             if (detailMap.get(PRINCIPAL) instanceof Map) {
-                Map<String,Object> principal = (Map<String, Object>) detailMap.get(PRINCIPAL);
-                user = toBean(principal,User.class);
+                Map<String, Object> principal = (Map<String, Object>) detailMap.get(PRINCIPAL);
+                user = toBean(principal, User.class);
             } else {
                 user = new User();
                 if (detailMap.containsKey(PRINCIPAL)) {
                     user.setUsername(detailMap.get(PRINCIPAL).toString());
-                }else if (detailMap.containsKey("login")) {
+                } else if (detailMap.containsKey("login")) {
                     user.setUsername(detailMap.get("login").toString());
                 }
                 
@@ -178,7 +174,7 @@ public class MainController {
         //  生成当前的所有授权
         List<GrantedAuthority> updatedAuthorities = new ArrayList<>(auth.getAuthorities());
         // 添加 ROLE_VIP 授权
-        updatedAuthorities.add(new SimpleGrantedAuthority(ROLE_PREFIX+ROLE_ADMIN));
+        updatedAuthorities.add(new SimpleGrantedAuthority(ROLE_PREFIX + ROLE_ADMIN));
         // 生成新的认证信息
         Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), updatedAuthorities);
         // 重置认证信息
