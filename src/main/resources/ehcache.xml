@@ -35,4 +35,15 @@
            memoryStoreEvictionPolicy="LRU">
         <persistence strategy="localTempSwap"/>
     </cache>
+    <!--24小时后缓存失效 -->
+    <cache name="visited"
+           maxElementsInMemory="10000"
+           eternal="false"
+           timeToIdleSeconds="0"
+           timeToLiveSeconds="86400"
+           maxElementsOnDisk="10000000"
+           diskExpiryThreadIntervalSeconds="120"
+           memoryStoreEvictionPolicy="LRU">
+        <persistence strategy="localTempSwap"/>
+    </cache>
 </ehcache>

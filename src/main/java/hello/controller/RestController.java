@@ -3,14 +3,13 @@ package hello.controller;
 import hello.model.User;
 import hello.repository.UserRepository;
 import hello.services.SmsService;
+import hello.services.VisitedService;
 import org.dom4j.DocumentException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.websocket.server.PathParam;
 
@@ -27,11 +26,18 @@ public class RestController {
     @Autowired
     UserRepository userRepository;
     
+    
     @Autowired
     SmsService smsService;
     
     @Autowired
     private HttpServletRequest request;
+    
+    @Autowired
+    private HttpServletResponse response;
+    
+    @Autowired
+    private VisitedService visitedService;
     
     
     @RequestMapping("/sendSmsCode")
@@ -51,6 +57,20 @@ public class RestController {
     @RequestMapping("/search")
     public User search(@PathParam("email") String email) {
         return userRepository.findByEmail(email);
+    }
+    
+    @RequestMapping("/updateVisit")
+    public String updateVisit(@PathParam("path") String path) {
+        int count = visitedService.getVisitedCount(path) + 1;
+        visitedService.putVisitedCount(path, count);
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        return count + "";
+    }
+    
+    @RequestMapping("/getVisit")
+    public String getVisit() {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        return visitedService.getMaxKey();
     }
     
 }

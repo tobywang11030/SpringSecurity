@@ -67,7 +67,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http.authorizeRequests().
                 antMatchers("/search").hasRole(ROLE_ADMIN).
-                antMatchers("/phone", "/register", "/sendSmsCode", "/indexFile/**", "/searchFile").permitAll().anyRequest().authenticated().
+                antMatchers("/phone", "/register", "/sendSmsCode", "/indexFile/**", "/searchFile", "/updateVisit",
+                        "/getVisit").permitAll().anyRequest().authenticated().
                 //antMatchers("/home", "/").hasAnyRole(ROLE_ADMIN, ROLE_CUSTOM, ROLE_USER).
                         and().formLogin().loginPage("/login").permitAll().successHandler(loginSuccessHandler()).
                 and().logout().permitAll().invalidateHttpSession(true).clearAuthentication(true).
